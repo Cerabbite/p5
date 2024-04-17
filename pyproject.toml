@@ -1,0 +1,16 @@
+[build-system]
+build-backend = "setuptools.build_meta"
+requires = ["setuptools"]
+
+[project]
+authors = [{name = "Cerabbite"}]
+dependencies = [
+  "requests",
+]
+description = "A simple CLI tool to create p5.js projects"
+license = {file = "LICENSE"}
+name = "p5"
+version = "2024.4.0a0"
+
+[project.scripts]
+p5 = "p5.p5:main"
