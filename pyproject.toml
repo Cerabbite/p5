@@ -14,3 +14,10 @@ version = "2024.4.0a1"
 
 [project.scripts]
 p5 = "p5.p5:main"
+
+[tool.black]
+line-length = 90
+
+[tool.ruff]
+line-length = 90
+lint.extend-select = ["C4", "I", "SIM"]

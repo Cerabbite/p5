@@ -2,6 +2,7 @@ import argparse
 import importlib.metadata
 import os
 import pathlib
+
 import requests
 
 __METADATA__ = importlib.metadata.metadata("p5")
@@ -37,13 +38,15 @@ def download_p5js(path, version="LATEST", addons=False):
     download = requests.get(
         f"https://github.com/processing/p5.js/releases/download/v{version}/p5.min.js"
     )
-    open(f"{str(path)}\\p5.min.js", "wb").write(download.content)
+    with open(f"{str(path)}\\p5.min.js", "wb") as file_p5:
+        file_p5.write(download.content)
 
     if addons:
         download = requests.get(
             f"https://github.com/processing/p5.js/releases/download/v{version}/p5.min.js"
         )
-        open(f"{str(path)}\\p5.sound.min.js", "wb").write(download.content)
+        with open(f"{str(path)}\\p5.sound.min.js", "wb") as file_p5_sound:
+            file_p5_sound.write(download.content)
 
 
 def create_project(name: str, addons: bool, version):
@@ -98,9 +101,14 @@ function draw() {
   ellipse(100, 120, 16, 16);
 }"""
 
-    open(f"{path}\\index.html", "w", encoding="utf-8").write(html_template)
-    open(f"{path}\\sketch.js", "w", encoding="utf-8").write(js_template)
-    open(f"{path}\\.gitignore", "w", encoding="utf-8").write(gitignore_text)
+    with open(f"{path}\\index.html", "w", encoding="utf-8") as file_index:
+        file_index.write(html_template)
+
+    with open(f"{path}\\sketch.js", "w", encoding="utf-8") as file_sketch:
+        file_sketch.write(js_template)
+
+    with open(f"{path}\\.gitignore", "w", encoding="utf-8") as file_gitignore:
+        file_gitignore.write(gitignore_text)
 
     download_p5js(path=path, version=version, addons=addons)
 
