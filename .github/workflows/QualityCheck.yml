@@ -23,6 +23,8 @@ jobs:
       - run: black p5/*.py
       - run: ruff check p5/*.py --fix
       - run: pyright p5/*.py
+      - run: git config user.name 'github-actions[bot]'
+      - run: git config user.email 'github-actions[bot]@users.noreply.github.com'
       - run: git add --all
       - run: git commit -m "QualityCheck Fixed code using ruff in CI/CD"
       - run: git push
