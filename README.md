@@ -12,4 +12,6 @@ A simple CLI tool to create p5.js projects
 - [x] Download p5.sound.min.js from server
 - [x] Add .gitignore file (ignore p5.min.js)
 - [ ] Error handling
-- [ ] Install non static version
+- [x] Install non static version
+- [ ] Remove all p5js files in a folder and/or subfolders
+- [ ] Change version of all p5js packages in a folder and/or subfolders

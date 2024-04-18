@@ -1,6 +1,7 @@
 import argparse
 import importlib.metadata
 import os
+import pathlib
 import requests
 
 __METADATA__ = importlib.metadata.metadata("p5")
@@ -22,14 +23,41 @@ class bcolors:
     UNDERLINE = "\033[4m"
 
 
-def create_project(name: str, addons: bool):
-    if os.path.isdir(name):
+def download_p5js(path, version="LATEST", addons=False):
+    if version == "LATEST":
+        version = requests.get("https://registry.npmjs.org/p5/latest").json()["version"]
+    else:
+        if requests.get(f"https://registry.npmjs.org/p5/{version}").status_code != 200:
+            print(
+                f"{bcolors.FAIL}Error: Cannot find specified version '{version}' of p5js{bcolors.ENDC}"
+            )
+            exit(1)
+
+    print(f"{bcolors.OKGREEN}Downloading p5js version {version}{bcolors.ENDC}")
+    download = requests.get(
+        f"https://github.com/processing/p5.js/releases/download/v{version}/p5.min.js"
+    )
+    open(f"{str(path)}\\p5.min.js", "wb").write(download.content)
+
+    if addons:
+        download = requests.get(
+            f"https://github.com/processing/p5.js/releases/download/v{version}/p5.min.js"
+        )
+        open(f"{str(path)}\\p5.sound.min.js", "wb").write(download.content)
+
+
+def create_project(name: str, addons: bool, version):
+    path = pathlib.Path(os.getcwd())
+    path = path / name
+    if os.path.isdir(path):
         print(
-            f"{bcolors.FAIL}Error: Directory name '{name}' already exists{bcolors.ENDC}"
+            f"{bcolors.FAIL}Error: Directory name '{path}' already exists{bcolors.ENDC}"
         )
         exit(1)
 
-    os.mkdir(name)
+    os.mkdir(path)
+
+    gitignore_text = "p5.min.js\n"
 
     html_template = """<!DOCTYPE html>
 <html lang="">
@@ -49,6 +77,7 @@ def create_project(name: str, addons: bool):
   <script src="sketch.js"></script>"""
     if addons:
         html_template += """\n  <script src="../addons/p5.sound.js"></script>"""
+        gitignore_text += "p5.sound.min.js"
 
     html_template += """\n</head>
 
@@ -69,51 +98,27 @@ function draw() {
   ellipse(100, 120, 16, 16);
 }"""
 
-    p5js_text = requests.get(
-        "https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.2/p5.min.js"
-    ).text
+    open(f"{path}\\index.html", "w", encoding="utf-8").write(html_template)
+    open(f"{path}\\sketch.js", "w", encoding="utf-8").write(js_template)
+    open(f"{path}\\.gitignore", "w", encoding="utf-8").write(gitignore_text)
 
-    html_file = open(f"{name}\\index.html", "w", encoding="utf-8")
-    html_file.write(html_template)
-    html_file.close()
-
-    js_file = open(f"{name}\\sketch.js", "w", encoding="utf-8")
-    js_file.write(js_template)
-    js_file.close()
-
-    p5js_file = open(f"{name}\\p5.min.js", "w", encoding="utf-8")
-    p5js_file.write(p5js_text)
-    p5js_file.close()
-
-    gitignore_text = "p5.min.js\n"
-
-    if addons:
-        p5sound_text = requests.get(
-            "https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.2/addons/p5.sound.min.js"
-        ).text
-
-        p5sound_file = open(f"{name}\\p5.sound.min.js", "w", encoding="utf-8")
-        p5sound_file.write(p5sound_text)
-        p5sound_file.close()
-
-        gitignore_text += "p5.sound.min.js"
-
-    gitignore_file = open(f"{name}\\.gitignore", "w", encoding="utf-8")
-    gitignore_file.write(gitignore_text)
-    gitignore_file.close()
+    download_p5js(path=path, version=version, addons=addons)
 
 
 def main():
     parser = argparse.ArgumentParser()
     subparsers = parser.add_subparsers(dest="command")
 
-    parser_create = subparsers.add_parser("create", help="Create a new p5.js project")
-    parser_create.add_argument("name", help="The name of your p5.js project")
-    parser_create.add_argument(
+    create_arg = subparsers.add_parser("create", help="Create a new p5.js project")
+    create_arg.add_argument("name", help="The name of your p5.js project")
+    create_arg.add_argument(
         "--addons", action="store_true", help="Include addons to your p5.js project"
+    )
+    create_arg.add_argument(
+        "--version", help="Specify version of p5.js to download", default="LATEST"
     )
 
     args = parser.parse_args()
 
     if args.command == "create":
-        create_project(args.name, args.addons)
+        create_project(name=args.name, addons=args.addons, version=args.version)
