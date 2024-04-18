@@ -2,8 +2,8 @@ import argparse
 import importlib.metadata
 import os
 import pathlib
+
 import requests
-import random
 
 __METADATA__ = importlib.metadata.metadata("p5")
 __NAME__ = __METADATA__["NAME"]
