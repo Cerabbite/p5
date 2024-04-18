@@ -34,7 +34,7 @@ def download_p5js(path, version="LATEST", addons=False):
             )
             exit(1)
 
-    print(f"{bcolors.OKGREEN}Downloading p5js version {version}{bcolors.ENDC}")
+    print(f"Downloading p5js version {version}")
     download = requests.get(
         f"https://github.com/processing/p5.js/releases/download/v{version}/p5.min.js"
     )
@@ -49,7 +49,7 @@ def download_p5js(path, version="LATEST", addons=False):
             file_p5_sound.write(download.content)
 
 
-def create_project(name: str, addons: bool, version):
+def create_project(name, addons, version):
     path = pathlib.Path(os.getcwd())
     path = path / name
     if os.path.isdir(path):
@@ -111,6 +111,10 @@ function draw() {
         file_gitignore.write(gitignore_text)
 
     download_p5js(path=path, version=version, addons=addons)
+
+    print(
+        f"{bcolors.OKGREEN}Successfully created p5js project {name} v{version}{bcolors.ENDC}"
+    )
 
 
 def main():
