@@ -118,6 +118,13 @@ def main():
         "--version", help="Specify version of p5.js to download", default="LATEST"
     )
 
+    parser.add_argument(
+        "-v",
+        "--version",
+        action="version",
+        version="%(prog)s {version}".format(version=__VERSION__),
+    )
+
     args = parser.parse_args()
 
     if args.command == "create":
