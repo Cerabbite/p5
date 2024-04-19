@@ -1,9 +1,10 @@
 import os
 import pathlib
-import unittest
-from p5 import p5
-from hashlib import sha256
 import shutil
+import unittest
+from hashlib import sha256
+
+from p5 import p5
 
 __HASHFILES_PATH__ = pathlib.Path(os.getcwd()) / "test\\hash_files"
 
