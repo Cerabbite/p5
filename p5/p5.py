@@ -129,6 +129,9 @@ function draw() {
 
     download_p5js(path=path, version=version, addons=addons)
 
+    if version == "LATEST":
+        version = get_latest_p5js_version()
+
     print(
         f"{bcolors.OKGREEN}Successfully created p5js project {name} v{version}{bcolors.ENDC}"
     )
