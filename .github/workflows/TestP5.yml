@@ -1,0 +1,24 @@
+name: Test p5
+on:
+  push:
+    branches: main
+  pull_request:
+    branches: main
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.12.3"  # Set Python version 
+      - name: Install Python requirements
+        run: |
+          python -m pip install -r requirements.txt
+          python -m pip install .
+      - name: Testing code
+        run: python test/test_p5.py
