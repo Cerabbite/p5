@@ -7,6 +7,7 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 ## 2024.4.2 (UNRELEASED)
 
 ### Added:
+- `reinstate` command that adds all p5js files back in
 - `clear` command that clears a project of all p5js files
 - The `create` command now also creates a `p5.toml` config file
 

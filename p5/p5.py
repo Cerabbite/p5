@@ -252,6 +252,18 @@ def clear_project(name):
     print(f"{bcolors.OKGREEN}Successfully cleared `{name}` {bcolors.ENDC}")
 
 
+def reinstate_project(name):
+    path = pathlib.Path(os.getcwd())
+    if name:
+        path = path / name
+
+    version, addons = read_p5_toml(path)
+
+    download_p5js(path, version, addons)
+
+    print(f"{bcolors.OKGREEN}Successfully reinstated `{name}` {bcolors.ENDC}")
+
+
 def main():
     parser = argparse.ArgumentParser()
     subparsers = parser.add_subparsers(dest="command")
@@ -289,6 +301,13 @@ def main():
         nargs="?",
     )
 
+    reinstate_arg = subparsers.add_parser("reinstate", help="Reinstate a p5js project")
+    reinstate_arg.add_argument(
+        "name",
+        help="[OPTIONAL] Specify the name of the p5.js project to upgrade",
+        nargs="?",
+    )
+
     args = parser.parse_args()
 
     if args.command == "create":
@@ -297,3 +316,5 @@ def main():
         upgrade_project(args.name, args.version)
     elif args.command == "clear":
         clear_project(args.name)
+    elif args.command == "reinstate":
+        reinstate_project(args.name)

@@ -15,5 +15,5 @@ A simple CLI tool to create p5.js projects
 - [x] Install non static version
 - [x] Remove all p5js files in a folder
 - [x] Change version of all p5js packages in a folder
-- [ ] Reinstate a p5js project
+- [x] Reinstate a p5js project
 - [x] Create a p5.toml config file
