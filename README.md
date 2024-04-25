@@ -13,5 +13,7 @@ A simple CLI tool to create p5.js projects
 - [x] Add .gitignore file (ignore p5.min.js)
 - [ ] Error handling
 - [x] Install non static version
-- [ ] Remove all p5js files in a folder and/or subfolders
-- [ ] Change version of all p5js packages in a folder and/or subfolders
+- [x] Remove all p5js files in a folder
+- [x] Change version of all p5js packages in a folder
+- [ ] Reinstate a p5js project
+- [x] Create a p5.toml config file

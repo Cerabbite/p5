@@ -5,6 +5,7 @@ import pathlib
 import re
 
 import requests
+import tomllib
 from packaging.version import Version
 
 __METADATA__ = importlib.metadata.metadata("p5")
@@ -24,6 +25,15 @@ class bcolors:
     ENDC = "\033[0m"
     BOLD = "\033[1m"
     UNDERLINE = "\033[4m"
+
+
+def read_p5_toml(path):
+    with open(path / "p5.toml", "rb") as f:
+        data = tomllib.load(f)
+        version = data["p5js"]["version"]
+        addons = data["p5js"]["addons"]
+
+    return (version, addons)
 
 
 def get_latest_p5js_version():
@@ -215,6 +225,33 @@ def upgrade_project(name, version):
     download_p5js(path=path, addons=addons, version=version)
 
 
+def clear_project(name):
+    path = pathlib.Path(os.getcwd())
+    if name:
+        path = path / name
+
+    if not (path / "p5.toml").is_file():
+        print(f"{bcolors.FAIL}Error: could not find `p5.toml` file{bcolors.ENDC}")
+        exit(1)
+
+    addons = read_p5_toml(path)[1]
+
+    if (path / "p5.min.js").is_file():
+        os.remove(path / "p5.min.js")
+    else:
+        print(f"{bcolors.WARNING}Warning: could not find p5.min.js{bcolors.ENDC}")
+
+    if addons:
+        if (path / "p5.sound.min.js").is_file():
+            os.remove(path / "p5.sound.min.js")
+        else:
+            print(
+                f"{bcolors.WARNING}Warning: could not find p5.sound.min.js{bcolors.ENDC}"
+            )
+
+    print(f"{bcolors.OKGREEN}Successfully cleared `{name}` {bcolors.ENDC}")
+
+
 def main():
     parser = argparse.ArgumentParser()
     subparsers = parser.add_subparsers(dest="command")
@@ -245,9 +282,18 @@ def main():
         "--version", help="Specify version of p5.js to download", default="LATEST"
     )
 
+    clear_arg = subparsers.add_parser("clear", help="Clear a p5.min.js files")
+    clear_arg.add_argument(
+        "name",
+        help="[OPTIONAL] Specify the name of the p5.js project to upgrade",
+        nargs="?",
+    )
+
     args = parser.parse_args()
 
     if args.command == "create":
         create_project(name=args.name, addons=args.addons, version=args.version)
     elif args.command == "upgrade":
         upgrade_project(args.name, args.version)
+    elif args.command == "clear":
+        clear_project(args.name)

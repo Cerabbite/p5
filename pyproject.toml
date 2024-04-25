@@ -6,7 +6,6 @@ requires = ["setuptools"]
 authors = [{name = "Cerabbite"}]
 dependencies = [
   "requests",
-  "toml",
 ]
 description = "A simple CLI tool to create p5.js projects"
 license = {file = "LICENSE"}
