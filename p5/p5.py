@@ -118,6 +118,13 @@ function draw() {
   ellipse(100, 120, 16, 16);
 }"""
 
+    if version == "LATEST":
+        version = get_latest_p5js_version()
+
+    p5_toml = f"""[p5js]
+version = "{version}"
+addons = {str(addons).lower()}"""
+
     with open(f"{path}\\index.html", "w", encoding="utf-8") as file_index:
         file_index.write(html_template)
 
@@ -127,10 +134,10 @@ function draw() {
     with open(f"{path}\\.gitignore", "w", encoding="utf-8") as file_gitignore:
         file_gitignore.write(gitignore_text)
 
-    download_p5js(path=path, version=version, addons=addons)
+    with open(f"{path}\\p5.toml", "w", encoding="utf-8") as file_p5_toml:
+        file_p5_toml.write(p5_toml)
 
-    if version == "LATEST":
-        version = get_latest_p5js_version()
+    download_p5js(path=path, version=version, addons=addons)
 
     print(
         f"{bcolors.OKGREEN}Successfully created p5js project {name} v{version}{bcolors.ENDC}"
