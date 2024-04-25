@@ -11,7 +11,7 @@ __HASHFILES_PATH__ = pathlib.Path(os.getcwd()) / "test\\hash_files"
 
 class TestP5Cli(unittest.TestCase):
     def test_get_latest_version(self):
-        self.assertEqual(p5.get_latest_p5js_version(), "1.9.2")
+        self.assertEqual(p5.get_latest_p5js_version(), "1.9.3")
 
     def test_download_p5(self):
         if not __HASHFILES_PATH__.is_dir():
