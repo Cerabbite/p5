@@ -89,13 +89,20 @@ def download_p5js(path, version="LATEST", addons=False) -> Error | None:
 def create_project(name, addons, version):
     path = pathlib.Path(os.getcwd())
     path = path / name
-    if os.path.isdir(path):
+    existing_path = os.path.isdir(path)
+    if existing_path:
         print(
-            f"{bcolors.FAIL}Error: Directory name '{path}' already exists{bcolors.ENDC}"
+            f"{bcolors.WARNING}Warning: Directory name '{path}' already exists{bcolors.ENDC}"
         )
-        exit(1)
-
-    os.mkdir(path)
+        while True:
+            q = input("Do you wish to continue? (y/n) ")
+            if q.lower() == "y":
+                break
+            elif q.lower() == "n":
+                print("Exiting program")
+                return
+    else:
+        os.mkdir(path)
 
     gitignore_text = "p5.min.js\n"
 
@@ -159,7 +166,8 @@ addons = {str(addons).lower()}"""
 
     ret_val = download_p5js(path=path, version=version, addons=addons)
     if isinstance(ret_val, Error):
-        shutil.rmtree(path)
+        if not existing_path:
+            shutil.rmtree(path)
         return ret_val
 
     print(
@@ -340,3 +348,4 @@ def main():
 
     if ret_val:
         print(f"{bcolors.FAIL}p5 exited with an error{bcolors.ENDC}")
+        exit(1)
