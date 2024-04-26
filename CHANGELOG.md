@@ -11,6 +11,10 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 - `clear` command that clears a project of all p5js files
 - The `create` command now also creates a `p5.toml` config file
 
+### Changed:
+- When the `create` command fails it deletes the created folder automatically
+- `create` command now asks you if you want to continue if project folder already exists
+
 ## 2024.4.1
 
 ### Fixed:
