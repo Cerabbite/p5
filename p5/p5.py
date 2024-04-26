@@ -3,6 +3,7 @@ import importlib.metadata
 import os
 import pathlib
 import re
+import shutil
 
 import requests
 import tomllib
@@ -27,6 +28,17 @@ class bcolors:
     UNDERLINE = "\033[4m"
 
 
+class Error:
+    def __init__(self, msg):
+        print(f"{bcolors.FAIL}{msg}{bcolors.ENDC}")
+
+
+class InvalidVersionNumberError(Error):
+    def __init__(self, msg):
+        new_msg = f"InvalidVersionNumber error: {msg}"
+        super().__init__(new_msg)
+
+
 def read_p5_toml(path):
     with open(path / "p5.toml", "rb") as f:
         data = tomllib.load(f)
@@ -40,24 +52,22 @@ def get_latest_p5js_version():
     return requests.get("https://registry.npmjs.org/p5/latest").json()["version"]
 
 
-def download_p5js(path, version="LATEST", addons=False):
+def download_p5js(path, version="LATEST", addons=False) -> Error | None:
     if version == "LATEST":
         version = get_latest_p5js_version()
     else:
         if requests.get(f"https://registry.npmjs.org/p5/{version}").status_code != 200:
-            print(
-                f"{bcolors.FAIL}Error: Cannot find specified version '{version}' of p5js{bcolors.ENDC}"
-            )
-            exit(1)
+            # raise InvalidVersionNumber(
+            #     f"Error: Cannot find specified version '{version}' of p5js"
+            # )
+            return InvalidVersionNumberError(f"Cannot find `{version}` of p5js")
 
     print(f"Downloading p5js version {version}")
     download = requests.get(
         f"https://github.com/processing/p5.js/releases/download/v{version}/p5.min.js"
     )
     if download.status_code != 200:
-        print(
-            f"{bcolors.FAIL}Error: Cannot download version '{version}' of p5js{bcolors.ENDC}"
-        )
+        print(f"{bcolors.FAIL}Cannot download version '{version}' of p5js{bcolors.ENDC}")
         exit(1)
 
     with open(f"{str(path)}\\p5.min.js", "wb") as file_p5:
@@ -147,14 +157,17 @@ addons = {str(addons).lower()}"""
     with open(f"{path}\\p5.toml", "w", encoding="utf-8") as file_p5_toml:
         file_p5_toml.write(p5_toml)
 
-    download_p5js(path=path, version=version, addons=addons)
+    ret_val = download_p5js(path=path, version=version, addons=addons)
+    if isinstance(ret_val, Error):
+        shutil.rmtree(path)
+        return ret_val
 
     print(
         f"{bcolors.OKGREEN}Successfully created p5js project {name} v{version}{bcolors.ENDC}"
     )
 
 
-def upgrade_project(name, version):
+def upgrade_project(name, version) -> Error | None:
     path = pathlib.Path(os.getcwd())
     if name:
         path = path / name
@@ -222,7 +235,9 @@ def upgrade_project(name, version):
             elif downgrade == "n":
                 exit(0)
 
-    download_p5js(path=path, addons=addons, version=version)
+    ret_val = download_p5js(path=path, version=version, addons=addons)
+    if isinstance(ret_val, Error):
+        return ret_val
 
 
 def clear_project(name):
@@ -252,14 +267,16 @@ def clear_project(name):
     print(f"{bcolors.OKGREEN}Successfully cleared `{name}` {bcolors.ENDC}")
 
 
-def reinstate_project(name):
+def reinstate_project(name) -> Error | None:
     path = pathlib.Path(os.getcwd())
     if name:
         path = path / name
 
     version, addons = read_p5_toml(path)
 
-    download_p5js(path, version, addons)
+    ret_val = download_p5js(path=path, version=version, addons=addons)
+    if isinstance(ret_val, Error):
+        return ret_val
 
     print(f"{bcolors.OKGREEN}Successfully reinstated `{name}` {bcolors.ENDC}")
 
@@ -310,11 +327,16 @@ def main():
 
     args = parser.parse_args()
 
+    ret_val = None
+
     if args.command == "create":
-        create_project(name=args.name, addons=args.addons, version=args.version)
+        ret_val = create_project(name=args.name, addons=args.addons, version=args.version)
     elif args.command == "upgrade":
-        upgrade_project(args.name, args.version)
+        ret_val = upgrade_project(args.name, args.version)
     elif args.command == "clear":
-        clear_project(args.name)
+        ret_val = clear_project(args.name)
     elif args.command == "reinstate":
-        reinstate_project(args.name)
+        ret_val = reinstate_project(args.name)
+
+    if ret_val:
+        print(f"{bcolors.FAIL}p5 exited with an error{bcolors.ENDC}")

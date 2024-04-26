@@ -4,10 +4,9 @@ requires = ["setuptools"]
 
 [project]
 authors = [{name = "Cerabbite"}]
-dependencies = [
-  "requests",
-]
+dependencies = ["requests>=2.31.0"]
 description = "A simple CLI tool to create p5.js projects"
+# dev-dependencies = ["pytest-cov>=5.0.0"]
 license = {file = "LICENSE"}
 name = "p5"
 version = "2024.4.2"
