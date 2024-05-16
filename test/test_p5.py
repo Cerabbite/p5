@@ -13,7 +13,7 @@ class TestP5Cli(unittest.TestCase):
     def test_get_latest_version(self):
         self.assertEqual(p5.get_latest_p5js_version(), "1.9.3")
 
-    def test_download_p5(self):
+    def test_download_p5_correct(self):
         if not __HASHFILES_PATH__.is_dir():
             os.mkdir(__HASHFILES_PATH__)
 
@@ -82,6 +82,25 @@ class TestP5Cli(unittest.TestCase):
             sha256(contents.encode("utf-8")).hexdigest(),
             "e2310876d8f60d0b1da36b95c9b3adc3b6f64d1bcc1a609dd13149f70f3f1acc",  # sha256 hash for p5.min.js v1.9.2
         )
+
+        # LATEST
+        p5.download_p5js(__HASHFILES_PATH__, version="LATEST", addons=False)
+
+        with open(__HASHFILES_PATH__ / "p5.min.js", "r", encoding="utf-8") as f:
+            contents = f.read()
+
+        self.assertEqual(
+            sha256(contents.encode("utf-8")).hexdigest(),
+            "2fee13caa878c2350ae3923af75be5148dad7fc066ce53e837fd26a25dcb553c",  # sha256 hash for p5.min.js v1.9.3 (LATEST)
+        )
+
+        shutil.rmtree(__HASHFILES_PATH__, ignore_errors=True)
+
+    def test_download_p5_failed(self):
+        if not __HASHFILES_PATH__.is_dir():
+            os.mkdir(__HASHFILES_PATH__)
+
+        print(p5.download_p5js(__HASHFILES_PATH__, version="LATEST", addons=False))
 
         shutil.rmtree(__HASHFILES_PATH__, ignore_errors=True)
 
