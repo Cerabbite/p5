@@ -12,7 +12,7 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 - The `create` command now also creates a `p5.toml` config file
 
 ### Changed:
-- When the `create` command fails it deletes the created folder automatically
+- `create` command deletes the created folder automatically when it fails
 - `create` command now asks you if you want to continue if project folder already exists
 
 ## 2024.4.1
